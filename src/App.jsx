@@ -6,8 +6,12 @@ function App() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    console.log(email);
-    console.log(password);
+    function handleLogin() {
+        console.log("Login clicked");
+
+        console.log("Email: ", email);
+        console.log("Password: ", password);
+    }
 
   return (
       <div className="app">
@@ -32,7 +36,9 @@ function App() {
               />
           </div>
 
-            <button>Login</button>
+            <button onClick={handleLogin} >
+            Login
+            </button>
         </div>
       </div>
   );
