@@ -7,9 +7,15 @@ body {
 .app {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #121212;
+}
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .login-card {
@@ -26,6 +32,34 @@ body {
   margin-bottom: 1.5rem;
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+.cars-page {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.cars-container {
+  width: 900px;
+  padding: 2rem;
+  background-color: #1e1e1e;
+  color: black;
+  border-radius: 12px
+}
+
+.car-card {
+  background-color: #121212;
+  color: #ffffff;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.cars-container h1 {
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .form-group {
