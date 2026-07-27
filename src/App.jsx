@@ -6,6 +6,8 @@ function App() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [cars, setCars] = useState([]);
+    const token = localStorage.getItem("token");
 
     async function handleLogin() {
         try {
@@ -38,7 +40,25 @@ function App() {
             console.log(error);
         }
     }
-    
+
+    async function getCars() {
+        try {
+            const response = await axios.get(
+                "https://carrental-26hx.onrender.com/cars",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+            setCars(response.data);
+            console.log(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div className="app">
             <div className="login-card">
@@ -64,6 +84,10 @@ function App() {
 
                 <button onClick={handleLogin}>
                     Login
+                </button>
+
+                <button onClick={getCars}>
+                    Get Cars
                 </button>
             </div>
         </div>
