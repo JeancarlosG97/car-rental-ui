@@ -9,7 +9,6 @@ function App() {
 
     async function handleLogin() {
         try {
-            console.log("before req");
             const response = await axios.post(
                 'https://carrental-26hx.onrender.com/auth/login',
                 {
@@ -17,19 +16,29 @@ function App() {
                     password: password
                 }
             );
-            console.log("after req");
-            console.log(response.data);
+
+            localStorage.setItem(
+                "token",
+                response.data.token
+            );
+            localStorage.setItem(
+                "role",
+                response.data.role
+            );
+
+            console.log("Token Saved");
+
         } catch (error) {
             console.log("ERROR");
 
-            if(error.respose) {
-                console.log("Status:", error.respose.status);
-                console.log("Data:", error.respose.data);
+            if (error.response) {
+                console.log("Status:", error.response.status);
+                console.log("Data:", error.response.data);
             }
             console.log(error);
         }
     }
-
+    
     return (
         <div className="app">
             <div className="login-card">
