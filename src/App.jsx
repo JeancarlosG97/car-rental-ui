@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -8,6 +8,7 @@ function App() {
     const [password, setPassword] = useState('');
     const [cars, setCars] = useState([]);
     const [loggedIn, setLoggedIn] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const token = localStorage.getItem("token");
 
@@ -33,6 +34,7 @@ function App() {
             );
 
             await getCars();
+            setErrorMessage('');
             setLoggedIn(true);
 
             console.log("Token Saved");
@@ -45,6 +47,7 @@ function App() {
                 console.log("Status:", error.response.status);
                 console.log("Data:", error.response.data);
             }
+            setErrorMessage("Invalid email or password");
 
             console.log(error);
         }
@@ -67,7 +70,6 @@ function App() {
         } catch (error) {
 
             console.log(error);
-
         }
     }
 
@@ -100,30 +102,41 @@ function App() {
 
                 <h1>Car Rental System</h1>
 
-                <div className="form-group">
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        placeholder="Enter email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleLogin();
+                    }}
+                >
+                    <div className="form-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            placeholder="Enter email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
 
-                <div className="form-group">
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    {errorMessage && (
+                        <p className="error-message">
+                            {errorMessage}
+                        </p>
+                    )}
 
-                <button onClick={handleLogin}>
-                    Login
-                </button>
-
+                    <button type="submit">
+                        Login
+                    </button>
+                </form>
             </div>
         </div>
     );
