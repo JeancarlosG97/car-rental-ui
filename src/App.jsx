@@ -9,6 +9,8 @@ function App() {
     const [cars, setCars] = useState([]);
     const [loggedIn, setLoggedIn] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [rentals, setRentals] = useState([]);
+    const [currentPage, setCurrentPage] = useState("cars");
 
     const token = localStorage.getItem("token");
 
@@ -75,14 +77,6 @@ function App() {
 
     async function rentCar(carId) {
 
-        const confirmed = window.confirm(
-            "Rent this car for 3 days?"
-        );
-
-        if(!confirmed) {
-            return;
-        }
-
         try {
 
             const response = await axios.post(
@@ -104,29 +98,123 @@ function App() {
         }
     }
 
+    async function getMyRentals() {
+
+        try {
+
+            const response = await axios.get(
+                'https://carrental-26hx.onrender.com/rentals/my',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            setRentals(response.data);
+
+            console.log(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     if (loggedIn) {
         return (
             <div className="cars-page">
                 <div className="cars-container">
 
-                    <h1>Available Cars</h1>
+                    <div className="nav-bar">
 
-                    {cars.map((car) => (
-                        <div
-                            key={car.id}
-                            className="car-card"
-                        >
-                            <h3>{car.make} {car.model}</h3>
-                            <p>Year: {car.year}</p>
-                            <p>Price Per Day: ${car.pricePerDay}</p>
-                            <button
-                                onClick={() => rentCar(car.id)}
-                            >
-                                Rent Car
-                            </button>
-                        </div>
-                    ))}
+                        <button onClick={() => setCurrentPage("cars")}>
+                            Cars
+                        </button>
 
+                        <button onClick={() => {
+                            getMyRentals();
+                            setCurrentPage("rentals");
+                        }}>
+                            My Rentals
+                        </button>
+
+                        <button onClick={() => {
+                            localStorage.removeItem("token");
+                            localStorage.removeItem("role");
+
+                            setLoggedIn(false);
+                        }}>
+                            Logout
+                        </button>
+
+                    </div>
+
+                    {currentPage === "cars" && (
+                        <>
+                            <h1>Available Cars</h1>
+
+                            {cars.map((car) => (
+                                <div
+                                    key={car.id}
+                                    className="car-card"
+                                >
+                                    <h3>{car.make} {car.model}</h3>
+
+                                    <p>Year: {car.year}</p>
+
+                                    <p>
+                                        Price Per Day: ${car.pricePerDay}
+                                    </p>
+
+                                    <button
+                                        onClick={() => rentCar(car.id)}
+                                    >
+                                        Rent Car
+                                    </button>
+                                </div>
+                            ))}
+                        </>
+                    )}
+
+                    {currentPage === "rentals" && (
+                        <>
+                            <h1>My Rentals</h1>
+
+                            {rentals.length === 0 && (
+                                <p>No rentals found.</p>
+                            )}
+
+                            {rentals.map((rental) => (
+                                <div
+                                    key={rental.rentalID}
+                                    className="car-card"
+                                >
+                                    <h3>
+                                        {rental.carMake} {rental.carModel}
+                                    </h3>
+
+                                    <p>
+                                        <strong>Rental ID:</strong> {rental.rentalID}
+                                    </p>
+
+                                    <p>
+                                        <strong>Rental Date:</strong> {rental.rentalDate}
+                                    </p>
+
+                                    <p>
+                                        <strong>Return Date:</strong> {rental.returnDate}
+                                    </p>
+
+                                    <p>
+                                        <strong>Price:</strong> ${rental.price}
+                                    </p>
+
+                                    <p>
+                                        <strong>Status:</strong>{" "}
+                                        {rental.returned ? "Returned" : "Active"}
+                                    </p>
+                                </div>
+                            ))}
+                        </>
+                    )}
                 </div>
             </div>
         );
