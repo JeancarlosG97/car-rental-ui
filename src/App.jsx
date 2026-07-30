@@ -73,6 +73,37 @@ function App() {
         }
     }
 
+    async function rentCar(carId) {
+
+        const confirmed = window.confirm(
+            "Rent this car for 3 days?"
+        );
+
+        if(!confirmed) {
+            return;
+        }
+
+        try {
+
+            const response = await axios.post(
+                `https://carrental-26hx.onrender.com/rentals/${carId}/3`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            console.log("Rental Created");
+            console.log(response.data);
+            alert("Rental created successfully!");
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     if (loggedIn) {
         return (
             <div className="cars-page">
@@ -88,6 +119,11 @@ function App() {
                             <h3>{car.make} {car.model}</h3>
                             <p>Year: {car.year}</p>
                             <p>Price Per Day: ${car.pricePerDay}</p>
+                            <button
+                                onClick={() => rentCar(car.id)}
+                            >
+                                Rent Car
+                            </button>
                         </div>
                     ))}
 
