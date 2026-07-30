@@ -4,6 +4,17 @@ body {
   background-color: #121212;
 }
 
+.nav-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.nav-bar button {
+  width: auto;
+  flex: 1;
+}
+
 .app {
   display: flex;
   justify-content: center;
