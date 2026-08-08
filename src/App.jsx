@@ -20,6 +20,7 @@ function App() {
         year: '',
         pricePerDay: ''
     });
+    const [editingCar, setEditingCar] = useState(null);
 
     async function handleLogin() {
         try {
@@ -190,6 +191,59 @@ function App() {
         }
     }
 
+    async function deleteCar(carId) {
+
+        try {
+
+            await axios.delete(
+                `https://carrental-26hx.onrender.com/cars/${carId}`,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
+
+            await getCars();
+
+            alert("Vehicle deleted successfully!");
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+    }
+
+    async function updateCar() {
+
+        try {
+
+            await axios.put(
+                `https://carrental-26hx.onrender.com/cars/${editingCar.id}`,
+                editingCar,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
+
+            await getCars();
+
+            setEditingCar(null);
+
+            alert("Vehicle updated successfully!");
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+    }
+
     useEffect(() => {
 
         if (loggedIn) {
@@ -237,7 +291,10 @@ function App() {
                                         ? 'active-tab'
                                         : ''
                                 }
-                                onClick={() => setCurrentPage('fleet')}
+                                onClick={async () => {
+                                    await getCars();
+                                    setCurrentPage("fleet");
+                                }}
                             >
                                 Fleet
                             </button>
@@ -268,7 +325,85 @@ function App() {
 
                             <div className="car-card">
 
-                                <h3>Add Vehicle</h3>
+                                {!editingCar && (
+
+                                    <div className="car-card">
+
+                                        <h3>Add Vehicle</h3>
+
+                                        ...
+
+                                    </div>
+
+                                )}
+
+                                {editingCar && (
+                                    <div className="car-card">
+
+                                        <h3>
+                                            Editing: {editingCar.make} {editingCar.model}
+                                        </h3>
+
+                                        <input
+                                            type="text"
+                                            value={editingCar.make}
+                                            onChange={(e) =>
+                                                setEditingCar({
+                                                    ...editingCar,
+                                                    make: e.target.value
+                                                })
+                                            }
+                                        />
+
+                                        <input
+                                            type="text"
+                                            value={editingCar.model}
+                                            onChange={(e) =>
+                                                setEditingCar({
+                                                    ...editingCar,
+                                                    model: e.target.value
+                                                })
+                                            }
+                                        />
+
+                                        <input
+                                            type="number"
+                                            value={editingCar.year}
+                                            onChange={(e) =>
+                                                setEditingCar({
+                                                    ...editingCar,
+                                                    year: e.target.value
+                                                })
+                                            }
+                                        />
+
+                                        <input
+                                            type="number"
+                                            value={editingCar.pricePerDay}
+                                            onChange={(e) =>
+                                                setEditingCar({
+                                                    ...editingCar,
+                                                    pricePerDay: e.target.value
+                                                })
+                                            }
+                                        />
+
+                                        <div className="edit-buttons">
+
+                                            <button onClick={updateCar}>
+                                                Save Changes
+                                            </button>
+
+                                            <button
+                                                onClick={() => setEditingCar(null)}
+                                            >
+                                                Cancel
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+                                )}
 
                                 <input
                                     type="text"
@@ -337,11 +472,34 @@ function App() {
                                         {car.make} {car.model}
                                     </h3>
 
-                                    <p>Year: {car.year}</p>
+                                    <p>
+                                        Year: {car.year}
+                                    </p>
 
                                     <p>
                                         Price Per Day: ${car.pricePerDay}
                                     </p>
+
+                                    <button
+                                        onClick={() => deleteCar(car.id)}
+                                    >
+                                        <div className="action-buttons">
+
+                                            <button
+                                                onClick={() => setEditingCar(car)}
+                                            >
+                                                Edit
+                                            </button>
+
+                                            <button
+                                                className="delete-btn"
+                                                onClick={() => deleteCar(car.id)}
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </div>
+                                    </button>
                                 </div>
                             ))}
                         </>

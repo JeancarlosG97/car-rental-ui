@@ -127,6 +127,24 @@ button:hover {
 }
 
 .active-tab {
-  background-color: #8d14a5 !important;
+  background-color: #cd25eb !important;
   border: 2px solid white;
+}
+
+.delete-btn {
+  background-color: #1e1e1e;
+}
+
+.delete-btn:hover {
+  background-color: #1e1e1e;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.edit-buttons button {
+  flex: 1;
 }
