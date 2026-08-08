@@ -6,17 +6,20 @@ function App() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
     const [cars, setCars] = useState([]);
     const [rentals, setRentals] = useState([]);
-
     const [loggedIn, setLoggedIn] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-
     const [currentPage, setCurrentPage] = useState('cars');
     const [rentalDays, setRentalDays] = useState({});
-
+    const role = localStorage.getItem("role");
     const token = localStorage.getItem('token');
+    const [newCar, setNewCar] = useState({
+        make: '',
+        model: '',
+        year: '',
+        pricePerDay: ''
+    });
 
     async function handleLogin() {
         try {
@@ -149,6 +152,44 @@ function App() {
         }
     }
 
+    async function addCar() {
+
+        try {
+
+            await axios.post(
+                'https://carrental-26hx.onrender.com/cars',
+                {
+                    make: newCar.make,
+                    model: newCar.model,
+                    year: Number(newCar.year),
+                    pricePerDay: Number(newCar.pricePerDay)
+                },
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
+
+            await getCars();
+
+            setNewCar({
+                make: '',
+                model: '',
+                year: '',
+                pricePerDay: ''
+            });
+
+            alert('Vehicle added successfully!');
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+    }
+
     useEffect(() => {
 
         if (loggedIn) {
@@ -189,6 +230,19 @@ function App() {
                             My Rentals
                         </button>
 
+                        {role === "ADMIN" && (
+                            <button
+                                className={
+                                    currentPage === 'fleet'
+                                        ? 'active-tab'
+                                        : ''
+                                }
+                                onClick={() => setCurrentPage('fleet')}
+                            >
+                                Fleet
+                            </button>
+                        )}
+
                         <button
                             onClick={() => {
 
@@ -207,6 +261,91 @@ function App() {
                         </button>
 
                     </div>
+
+                    {currentPage === 'fleet' && role === 'ADMIN' && (
+                        <>
+                            <h1>Fleet Management</h1>
+
+                            <div className="car-card">
+
+                                <h3>Add Vehicle</h3>
+
+                                <input
+                                    type="text"
+                                    placeholder="Make"
+                                    value={newCar.make}
+                                    onChange={(e) =>
+                                        setNewCar({
+                                            ...newCar,
+                                            make: e.target.value
+                                        })
+                                    }
+                                />
+
+                                <input
+                                    type="text"
+                                    placeholder="Model"
+                                    value={newCar.model}
+                                    onChange={(e) =>
+                                        setNewCar({
+                                            ...newCar,
+                                            model: e.target.value
+                                        })
+                                    }
+                                />
+
+                                <input
+                                    type="number"
+                                    placeholder="Year"
+                                    value={newCar.year}
+                                    onChange={(e) =>
+                                        setNewCar({
+                                            ...newCar,
+                                            year: e.target.value
+                                        })
+                                    }
+                                />
+
+                                <input
+                                    type="number"
+                                    placeholder="Price Per Day"
+                                    value={newCar.pricePerDay}
+                                    onChange={(e) =>
+                                        setNewCar({
+                                            ...newCar,
+                                            pricePerDay: e.target.value
+                                        })
+                                    }
+                                />
+
+                                <button onClick={addCar}>
+                                    Add Car
+                                </button>
+
+                            </div>
+
+                            <h2 style={{ color: "white" }}>
+                                Current Fleet
+                            </h2>
+
+                            {cars.map((car) => (
+                                <div
+                                    key={car.id}
+                                    className="car-card"
+                                >
+                                    <h3>
+                                        {car.make} {car.model}
+                                    </h3>
+
+                                    <p>Year: {car.year}</p>
+
+                                    <p>
+                                        Price Per Day: ${car.pricePerDay}
+                                    </p>
+                                </div>
+                            ))}
+                        </>
+                    )}
 
                     {currentPage === 'cars' && (
                         <>
