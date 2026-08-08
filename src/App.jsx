@@ -6,13 +6,17 @@ function App() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
     const [cars, setCars] = useState([]);
+    const [rentals, setRentals] = useState([]);
+
     const [loggedIn, setLoggedIn] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [rentals, setRentals] = useState([]);
-    const [currentPage, setCurrentPage] = useState("cars");
 
-    const token = localStorage.getItem("token");
+    const [currentPage, setCurrentPage] = useState('cars');
+    const [rentalDays, setRentalDays] = useState({});
+
+    const token = localStorage.getItem('token');
 
     async function handleLogin() {
         try {
@@ -20,36 +24,31 @@ function App() {
             const response = await axios.post(
                 'https://carrental-26hx.onrender.com/auth/login',
                 {
-                    email: email,
-                    password: password
+                    email,
+                    password
                 }
             );
 
             localStorage.setItem(
-                "token",
+                'token',
                 response.data.token
             );
 
             localStorage.setItem(
-                "role",
+                'role',
                 response.data.role
             );
 
             await getCars();
+
             setErrorMessage('');
             setLoggedIn(true);
 
-            console.log("Token Saved");
-
         } catch (error) {
 
-            console.log("ERROR");
-
-            if (error.response) {
-                console.log("Status:", error.response.status);
-                console.log("Data:", error.response.data);
-            }
-            setErrorMessage("Invalid email or password");
+            setErrorMessage(
+                'Invalid email or password'
+            );
 
             console.log(error);
         }
@@ -66,40 +65,18 @@ function App() {
                     }
                 }
             );
-
+            console.log("Cars:");
+            console.log(response.data);
             setCars(response.data);
 
         } catch (error) {
 
             console.log(error);
-        }
-    }
 
-    async function rentCar(carId) {
-
-        try {
-
-            const response = await axios.post(
-                `https://carrental-26hx.onrender.com/rentals/${carId}/3`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
-
-            console.log("Rental Created");
-            console.log(response.data);
-            alert("Rental created successfully!");
-
-        } catch (error) {
-            console.log(error);
         }
     }
 
     async function getMyRentals() {
-
         try {
 
             const response = await axios.get(
@@ -110,11 +87,65 @@ function App() {
                     }
                 }
             );
+
             setRentals(response.data);
 
-            console.log(response.data);
         } catch (error) {
+
             console.log(error);
+
+        }
+    }
+
+    async function rentCar(carId, days) {
+
+        try {
+
+            const response = await axios.post(
+                `https://carrental-26hx.onrender.com/rentals/${carId}/${days}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            console.log(response.data);
+
+            await getMyRentals();
+
+            alert('Rental created successfully!');
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+    }
+
+    async function returnCar(rentalId) {
+
+        try {
+
+            await axios.put(
+                `https://carrental-26hx.onrender.com/rentals/${rentalId}/return`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            await getMyRentals();
+
+            alert('Vehicle returned successfully!');
+
+        } catch (error) {
+
+            console.log(error);
+
         }
     }
 
@@ -125,29 +156,51 @@ function App() {
 
                     <div className="nav-bar">
 
-                        <button onClick={() => setCurrentPage("cars")}>
+                        <button
+                            className={
+                                currentPage === 'cars'
+                                    ? 'active-tab'
+                                    : ''
+                            }
+                            onClick={() => setCurrentPage('cars')}
+                        >
                             Cars
                         </button>
 
-                        <button onClick={() => {
-                            getMyRentals();
-                            setCurrentPage("rentals");
-                        }}>
+                        <button
+                            className={
+                                currentPage === 'rentals'
+                                    ? 'active-tab'
+                                    : ''
+                            }
+                            onClick={async () => {
+                                await getMyRentals();
+                                setCurrentPage('rentals');
+                            }}
+                        >
                             My Rentals
                         </button>
 
-                        <button onClick={() => {
-                            localStorage.removeItem("token");
-                            localStorage.removeItem("role");
+                        <button
+                            onClick={() => {
 
-                            setLoggedIn(false);
-                        }}>
+                                localStorage.removeItem('token');
+                                localStorage.removeItem('role');
+
+                                setCars([]);
+                                setRentals([]);
+
+                                setLoggedIn(false);
+                                setCurrentPage('cars');
+
+                            }}
+                        >
                             Logout
                         </button>
 
                     </div>
 
-                    {currentPage === "cars" && (
+                    {currentPage === 'cars' && (
                         <>
                             <h1>Available Cars</h1>
 
@@ -156,16 +209,45 @@ function App() {
                                     key={car.id}
                                     className="car-card"
                                 >
-                                    <h3>{car.make} {car.model}</h3>
-
-                                    <p>Year: {car.year}</p>
+                                    <h3>
+                                        {car.make} {car.model}
+                                    </h3>
 
                                     <p>
-                                        Price Per Day: ${car.pricePerDay}
+                                        Year: {car.year}
                                     </p>
 
+                                    <p>
+                                        Price Per Day: $
+                                        {car.pricePerDay}
+                                    </p>
+
+                                    <label>
+                                        Rental Days
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={
+                                            rentalDays[car.id] || 1
+                                        }
+                                        onChange={(e) =>
+                                            setRentalDays({
+                                                ...rentalDays,
+                                                [car.id]:
+                                                e.target.value
+                                            })
+                                        }
+                                    />
+
                                     <button
-                                        onClick={() => rentCar(car.id)}
+                                        onClick={() =>
+                                            rentCar(
+                                                car.id,
+                                                rentalDays[car.id] || 1
+                                            )
+                                        }
                                     >
                                         Rent Car
                                     </button>
@@ -174,12 +256,14 @@ function App() {
                         </>
                     )}
 
-                    {currentPage === "rentals" && (
+                    {currentPage === 'rentals' && (
                         <>
                             <h1>My Rentals</h1>
 
                             {rentals.length === 0 && (
-                                <p>No rentals found.</p>
+                                <p>
+                                    No rentals found.
+                                </p>
                             )}
 
                             {rentals.map((rental) => (
@@ -188,33 +272,53 @@ function App() {
                                     className="car-card"
                                 >
                                     <h3>
-                                        {rental.carMake} {rental.carModel}
+                                        {rental.carMake}{' '}
+                                        {rental.carModel}
                                     </h3>
 
                                     <p>
-                                        <strong>Rental ID:</strong> {rental.rentalID}
+                                        <strong>Rental ID:</strong>{' '}
+                                        {rental.rentalID}
                                     </p>
 
                                     <p>
-                                        <strong>Rental Date:</strong> {rental.rentalDate}
+                                        <strong>Rental Date:</strong>{' '}
+                                        {rental.rentalDate}
                                     </p>
 
                                     <p>
-                                        <strong>Return Date:</strong> {rental.returnDate}
+                                        <strong>Return Date:</strong>{' '}
+                                        {rental.returnDate}
                                     </p>
 
                                     <p>
-                                        <strong>Price:</strong> ${rental.price}
+                                        <strong>Price:</strong> $
+                                        {rental.price}
                                     </p>
 
                                     <p>
-                                        <strong>Status:</strong>{" "}
-                                        {rental.returned ? "Returned" : "Active"}
+                                        <strong>Status:</strong>{' '}
+                                        {rental.returned
+                                            ? 'Returned'
+                                            : 'Active'}
                                     </p>
+
+                                    {!rental.returned && (
+                                        <button
+                                            onClick={() =>
+                                                returnCar(
+                                                    rental.rentalID
+                                                )
+                                            }
+                                        >
+                                            Return Car
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </>
                     )}
+
                 </div>
             </div>
         );
@@ -232,25 +336,33 @@ function App() {
                         handleLogin();
                     }}
                 >
+
                     <div className="form-group">
                         <label>Email</label>
+
                         <input
                             type="email"
                             placeholder="Enter email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) =>
+                                setEmail(e.target.value)
+                            }
                         />
                     </div>
 
                     <div className="form-group">
                         <label>Password</label>
+
                         <input
                             type="password"
                             placeholder="Enter your password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) =>
+                                setPassword(e.target.value)
+                            }
                         />
                     </div>
+
                     {errorMessage && (
                         <p className="error-message">
                             {errorMessage}
@@ -260,7 +372,9 @@ function App() {
                     <button type="submit">
                         Login
                     </button>
+
                 </form>
+
             </div>
         </div>
     );
