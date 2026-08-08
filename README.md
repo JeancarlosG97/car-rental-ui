@@ -85,4 +85,142 @@ You can also create a new account directly from the application.
 - Render (Frontend)
 - Render (Backend)
 
-### 
+### Documentation & Testing
+
+- Swagger UI
+- Postman
+
+---
+
+## User Workflow
+
+```text
+Login
+    ↓
+Browse Available Cars
+    ↓
+Choose Rental Duration
+    ↓
+Rent Vehicle
+    ↓
+View My Rentals
+    ↓
+Return Vehicle
+```
+
+---
+
+## Admin Workflow
+
+```text
+Login
+    ↓
+Fleet Management
+    ↓
+Add Vehicle
+    ↓
+Edit Vehicle
+    ↓
+Delete Vehicle
+```
+
+---
+
+## Full-Stack Architecture
+
+```text
+React Frontend
+        │
+        ▼
+Spring Boot REST API
+        │
+        ▼
+Service Layer
+        │
+        ▼
+Repository Layer
+        │
+        ▼
+MySQL Database
+```
+
+The application follows a layered architecture where controllers handle HTTP requests, services enforce business rules, and repositories manage database interactions.
+
+---
+
+## Security
+
+### Authentication
+
+- JWT-based authentication
+- Stateless security model
+- Secure password hashing with BCrypt
+
+### Authorization
+
+#### USER
+
+- View available vehicles
+- Rent vehicles
+- View personal rentals
+- Return owned rentals
+
+#### ADMIN
+
+- View fleet inventory
+- Add vehicles
+- Edit vehicles
+- Delete vehicles
+- Create rentals for customers
+- Access administrative functionality
+
+---
+
+## Business Rules Enforced
+
+- Cars must be available before rental
+- Cars become unavailable during active rentals
+- Returned vehicles automatically become available again
+- Users can only manage their own rentals
+- Administrators have full system access
+- Rental durations are validated before processing
+
+---
+
+## Highlights
+
+- Full-stack React + Spring Boot application
+- Secure JWT authentication and authorization
+- Role-based access control
+- Vehicle rental lifecycle management
+- Fleet CRUD operations
+- RESTful API integration using Axios
+- Cloud-hosted MySQL database
+- Separate frontend and backend deployments on Render
+
+---
+
+## Future Enhancements
+
+- Customer Management Dashboard
+- Rental Analytics
+- Vehicle Search and Filtering
+- Pagination
+- Unit Testing with JUnit and Mockito
+- Integration Testing
+- Redis Caching
+- CI/CD Pipeline with GitHub Actions
+
+---
+
+## Author
+
+**Jeancarlos Guerrero**
+
+GitHub: https://github.com/JeancarlosG97
+
+---
+
+## Resume Summary
+
+Built and deployed a full-stack vehicle rental platform using React, Spring Boot, Spring Security, JWT, and MySQL. Implemented secure authentication, role-based authorization, vehicle rentals, rental returns, and administrative fleet management features while deploying both frontend and backend services to Render.
