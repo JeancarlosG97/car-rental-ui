@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -148,6 +148,14 @@ function App() {
 
         }
     }
+
+    useEffect(() => {
+
+        if (loggedIn) {
+            getCars();
+        }
+
+    }, [loggedIn]);
 
     if (loggedIn) {
         return (
